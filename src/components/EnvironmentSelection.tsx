@@ -38,6 +38,7 @@ const EnvironmentSelection: React.FC<EnvironmentSelectionProps> = ({
             description={env.description}
             icon={getIconComponent(env.icon)}
             isSelected={selectedEnvironment === env.id}
+            isDisabled={selectedEnvironment !== null && selectedEnvironment !== env.id}
             onClick={() => onEnvironmentSelect(env.id)}
           />
         ))}
