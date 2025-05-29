@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import FormatCard from './FormatCard';
 import Button from './Button';
 import { AdFormat } from '../types';
@@ -40,7 +40,7 @@ const AdFormatSelection: React.FC<AdFormatSelectionProps> = ({
         <Button
           onClick={onFormatConfirm}
           disabled={selectedFormats.length === 0}
-          icon={<ArrowRight className="h-4 w-4" />}
+          icon={<BarChart3 className="h-4 w-4" />}
         >
           Activate Campaign
         </Button>

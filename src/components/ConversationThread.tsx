@@ -46,6 +46,9 @@ const ConversationThread: React.FC<ConversationThreadProps> = ({
   onFormatSelect,
   onFormatConfirm,
 }) => {
+  // Check if ad formats are already showing
+  const hasAdFormatSelection = conversationItems.some(item => item.type === 'ad-format-selection');
+
   const renderConversationItem = (item: ConversationItem) => {
     switch (item.type) {
       case 'message':
@@ -93,11 +96,13 @@ const ConversationThread: React.FC<ConversationThreadProps> = ({
         return (
           <div key={item.id} className="my-4">
             <SegmentRecommendations recommendedSegments={recommendedSegments} />
-            <div className="flex justify-end mt-6">
-              <Button onClick={onContinueToFormats} variant="primary">
-                Continue to Ad Formats
-              </Button>
-            </div>
+            {!hasAdFormatSelection && (
+              <div className="flex justify-end mt-6">
+                <Button onClick={onContinueToFormats} variant="primary">
+                  Continue to Ad Formats
+                </Button>
+              </div>
+            )}
           </div>
         );
       
