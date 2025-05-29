@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Tv, Users, ArrowRight, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import MessageBubble from '../components/MessageBubble';
-import OptionCard from '../components/OptionCard';
-import FormatCard from '../components/FormatCard';
+import EnvironmentSelection from '../components/EnvironmentSelection';
+import AdFormatSelection from '../components/AdFormatSelection';
+import SegmentRecommendations from '../components/SegmentRecommendations';
 import Button from '../components/Button';
 import ProgressSteps from '../components/ProgressSteps';
-import SegmentBadge from '../components/SegmentBadge';
 import { PlanProvider, usePlan } from '../context/PlanContext';
-import { environments, adFormats } from '../data/mockData';
 
 const PlanContent: React.FC = () => {
   const navigate = useNavigate();
@@ -19,7 +18,6 @@ const PlanContent: React.FC = () => {
     setSelectedEnvironment,
     selectedFormats,
     setSelectedFormats,
-    campaignPrompt,
     setCampaignPrompt,
     recommendedSegments,
     isLoading,
@@ -30,19 +28,6 @@ const PlanContent: React.FC = () => {
   } = usePlan();
 
   const [promptInput, setPromptInput] = useState('');
-
-  const getIconComponent = (iconName: string) => {
-    switch (iconName) {
-      case 'Tv':
-        return <Tv className="h-5 w-5" />;
-      case 'Globe':
-        return <Globe className="h-5 w-5" />;
-      case 'Users':
-        return <Users className="h-5 w-5" />;
-      default:
-        return null;
-    }
-  };
 
   const handleEnvironmentSelect = (envId: string) => {
     setSelectedEnvironment(envId);
@@ -152,54 +137,24 @@ const PlanContent: React.FC = () => {
               content={message.content}
             />
           ))}
-          {isLoading && <MessageBubble type="ai\" content="\" isLoading={true} />}
+          {isLoading && <MessageBubble type="ai" content="" isLoading={true} />}
         </div>
 
         {currentStep === 1 && (
-          <div className="mt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Select an environment</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {environments.map((env) => (
-                <OptionCard
-                  key={env.id}
-                  title={env.title}
-                  description={env.description}
-                  icon={getIconComponent(env.icon)}
-                  isSelected={selectedEnvironment === env.id}
-                  onClick={() => handleEnvironmentSelect(env.id)}
-                />
-              ))}
-            </div>
-          </div>
+          <EnvironmentSelection
+            selectedEnvironment={selectedEnvironment}
+            onEnvironmentSelect={handleEnvironmentSelect}
+          />
         )}
 
         {currentStep === 2 && selectedEnvironment && (
-          <div className="mt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">
-              Select ad formats for {getEnvironmentName(selectedEnvironment)}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              {adFormats[selectedEnvironment as keyof typeof adFormats].map((format) => (
-                <FormatCard
-                  key={format.id}
-                  title={format.title}
-                  description={format.description}
-                  imageUrl={format.imageUrl}
-                  isSelected={selectedFormats.includes(format.id)}
-                  onClick={() => handleFormatSelect(format.id)}
-                />
-              ))}
-            </div>
-            <div className="flex justify-end">
-              <Button
-                onClick={handleFormatConfirm}
-                disabled={selectedFormats.length === 0}
-                icon={<ArrowRight className="h-4 w-4" />}
-              >
-                Continue
-              </Button>
-            </div>
-          </div>
+          <AdFormatSelection
+            selectedEnvironment={selectedEnvironment}
+            selectedFormats={selectedFormats}
+            environmentName={getEnvironmentName(selectedEnvironment)}
+            onFormatSelect={handleFormatSelect}
+            onFormatConfirm={handleFormatConfirm}
+          />
         )}
 
         {currentStep === 3 && (
@@ -219,34 +174,11 @@ const PlanContent: React.FC = () => {
           </form>
         )}
 
-        {currentStep === 4 && recommendedSegments.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Recommended audience segments</h3>
-            <div className="space-y-4">
-              {recommendedSegments.map((segment) => (
-                <div key={segment.id} className="bg-white rounded-lg border border-gray-200 p-4">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center">
-                        <h4 className="font-medium text-gray-900">{segment.name}</h4>
-                        <SegmentBadge
-                          label={segment.name}
-                          color={segment.color as any}
-                          className="ml-2"
-                        />
-                      </div>
-                      <p className="text-sm text-gray-500 mt-1">{segment.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end mt-4">
-              <Button onClick={handleContinueToActivate} variant="primary">
-                Continue to Activate
-              </Button>
-            </div>
-          </div>
+        {currentStep === 4 && (
+          <SegmentRecommendations
+            recommendedSegments={recommendedSegments}
+            onContinueToActivate={handleContinueToActivate}
+          />
         )}
       </div>
     </div>
