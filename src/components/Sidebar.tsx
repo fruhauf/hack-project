@@ -10,8 +10,8 @@ import {
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-primary text-white">
-      <div className="p-4 border-b border-primary">
+    <aside className="hidden md:flex flex-col w-64 bg-neutral text-white">
+      <div className="p-4 border-b border-neutral">
         <div className="flex items-center space-x-2">
            <img
             src="assets/images/kargo-logo.svg"
@@ -26,7 +26,7 @@ const Sidebar: React.FC = () => {
           className={({ isActive }) =>
             `flex items-center px-4 py-3 text-sm rounded-lg ${
               isActive
-                ? "bg-blue-800 text-white"
+                ? "bg-primary text-white"
                 : "hover:bg-blue-800 hover:text-white"
             } transition-colors`
           }
@@ -40,7 +40,7 @@ const Sidebar: React.FC = () => {
           className={({ isActive }) =>
             `flex items-center px-4 py-3 text-sm rounded-lg ${
               isActive
-                ? "bg-blue-800 text-white"
+                ? "bg-primary text-white"
                 : "hover:bg-blue-800 hover:text-white"
             } transition-colors`
           }
@@ -53,7 +53,7 @@ const Sidebar: React.FC = () => {
           className={({ isActive }) =>
             `flex items-center px-4 py-3 text-sm rounded-lg ${
               isActive
-                ? "bg-blue-800 text-white"
+                ? "bg-primary text-white"
                 : "hover:bg-blue-800 hover:text-white"
             } transition-colors`
           }
@@ -66,7 +66,7 @@ const Sidebar: React.FC = () => {
           className={({ isActive }) =>
             `flex items-center px-4 py-3 text-sm rounded-lg ${
               isActive
-                ? "bg-blue-800 text-white"
+                ? "bg-primary text-white"
                 : "hover:bg-blue-800 hover:text-white"
             } transition-colors`
           }
@@ -75,7 +75,7 @@ const Sidebar: React.FC = () => {
           <span>Measure</span>
         </NavLink>
       </nav>
-      <div className="p-4 border-t border-primary">
+      <div className="p-4 border-t border-neutral">
         <div className="flex items-center px-4 py-3 text-sm rounded-lg hover:bg-blue-800 hover:text-white transition-colors">
           <HelpCircle className="h-5 w-5 mr-3" />
           <span>Help & Resources</span>
