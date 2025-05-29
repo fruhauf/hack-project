@@ -105,6 +105,8 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
           type: 'ai',
           content: `Based on your campaign for "${campaignPrompt}", I recommend the following audience segments for your ${getEnvironmentName(selectedEnvironment)} campaign using ${selectedFormats.map(f => getFormatName(f)).join(' and ')}:`,
         });
+        
+        setCurrentStep(4);
       }, 2000);
     }
   }, [campaignPrompt, selectedEnvironment, selectedFormats]);
