@@ -1,6 +1,13 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { Layers, PieChart, PlayCircle, HelpCircle, BarChart3 } from 'lucide-react';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import {
+  Layers,
+  Palette,
+  PieChart,
+  PlayCircle,
+  HelpCircle,
+  BarChart3,
+} from "lucide-react";
 
 const Sidebar: React.FC = () => {
   return (
@@ -12,30 +19,55 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
       <nav className="flex-1 px-2 py-4 space-y-1">
-        <NavLink 
-          to="/" 
-          className={({isActive}) => `flex items-center px-4 py-3 text-sm rounded-lg ${
-            isActive ? 'bg-blue-800 text-white' : 'text-blue-100 hover:bg-blue-800 hover:text-white'
-          } transition-colors`}
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 text-sm rounded-lg ${
+              isActive
+                ? "bg-blue-800 text-white"
+                : "text-blue-100 hover:bg-blue-800 hover:text-white"
+            } transition-colors`
+          }
           end
         >
           <PlayCircle className="h-5 w-5 mr-3" />
           <span>Plan</span>
         </NavLink>
-        <NavLink 
-          to="/activate" 
-          className={({isActive}) => `flex items-center px-4 py-3 text-sm rounded-lg ${
-            isActive ? 'bg-blue-800 text-white' : 'text-blue-100 hover:bg-blue-800 hover:text-white'
-          } transition-colors`}
+        <NavLink
+          to="/create"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 text-sm rounded-lg ${
+              isActive
+                ? "bg-blue-800 text-white"
+                : "text-blue-100 hover:bg-blue-800 hover:text-white"
+            } transition-colors`
+          }
+        >
+          <Palette className="h-5 w-5 mr-3" />
+          <span>Create</span>
+        </NavLink>
+        <NavLink
+          to="/activate"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 text-sm rounded-lg ${
+              isActive
+                ? "bg-blue-800 text-white"
+                : "text-blue-100 hover:bg-blue-800 hover:text-white"
+            } transition-colors`
+          }
         >
           <BarChart3 className="h-5 w-5 mr-3" />
           <span>Activate</span>
         </NavLink>
-        <NavLink 
-          to="/measure" 
-          className={({isActive}) => `flex items-center px-4 py-3 text-sm rounded-lg ${
-            isActive ? 'bg-blue-800 text-white' : 'text-blue-100 hover:bg-blue-800 hover:text-white'
-          } transition-colors`}
+        <NavLink
+          to="/measure"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 text-sm rounded-lg ${
+              isActive
+                ? "bg-blue-800 text-white"
+                : "text-blue-100 hover:bg-blue-800 hover:text-white"
+            } transition-colors`
+          }
         >
           <PieChart className="h-5 w-5 mr-3" />
           <span>Measure</span>

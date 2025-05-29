@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import PlanPage from './pages/Plan';
+import CreatePage from './pages/Create';
 import ActivatePage from './pages/Activate';
 import MeasurePage from './pages/Measure';
 
@@ -11,6 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<PlanPage />} />
+          <Route path="create" element={<CreatePage />} />
           <Route path="activate" element={<ActivatePage />} />
           <Route path="measure" element={<MeasurePage />} />
         </Route>
