@@ -1,3 +1,43 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, cupcake, corporate, retro, cyberpunk, valentine, garden, forest, aqua, luxury, dracula, business, night, coffee, winter;
+}
+
+@plugin "daisyui/theme" {
+    name: "kargo";
+    default: true;
+    prefersdark: false;
+    color-scheme: light;
+
+    --color-base-100: #fff;
+    --color-base-200: #f5f6fa;
+    --color-base-300: #e5e7eb;
+    --color-base-content: #22223b;
+    --color-primary: #3c61f3;
+    --color-primary-content: #fff;
+    --color-secondary: #f5f6fa;
+    --color-secondary-content: #3c61f3;
+    --color-accent: #e5e7eb;
+    --color-accent-content: #22223b;
+    --color-neutral: #1e1e1e;
+    --color-neutral-content: #fff;
+    --color-info: #3c61f3;
+    --color-info-content: #fff;
+    --color-success: #22c55e;
+    --color-success-content: #fff;
+    --color-warning: #facc15;
+    --color-warning-content: #22223b;
+    --color-error: #ef4444;
+    --color-error-content: #fff;
+
+    --radius-selector: 0.75rem;
+    --radius-field: 0.5rem;
+    --radius-box: 1rem;
+    --font-sans: 'Poppins', Arial, sans-serif;
+}
+
+@plugin "daisyui/theme" {
+    name: "dark";
+    prefersdark: true;
+    color-scheme: dark;
+}

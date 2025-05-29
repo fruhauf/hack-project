@@ -2,10 +2,10 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import FormatCard from './FormatCard';
 import Button from './Button';
-import { adFormats } from '../data/mockData';
+import { AdFormat } from '../types';
 
 interface AdFormatSelectionProps {
-  selectedEnvironment: string;
+  adFormats: AdFormat[];
   selectedFormats: string[];
   environmentName: string;
   onFormatSelect: (formatId: string) => void;
@@ -13,7 +13,7 @@ interface AdFormatSelectionProps {
 }
 
 const AdFormatSelection: React.FC<AdFormatSelectionProps> = ({
-  selectedEnvironment,
+  adFormats,
   selectedFormats,
   environmentName,
   onFormatSelect,
@@ -25,7 +25,7 @@ const AdFormatSelection: React.FC<AdFormatSelectionProps> = ({
         Select ad formats for {environmentName}
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        {adFormats[selectedEnvironment as keyof typeof adFormats].map((format) => (
+        {adFormats.map((format) => (
           <FormatCard
             key={format.id}
             title={format.title}

@@ -7,7 +7,7 @@ import AdFormatSelection from '../components/AdFormatSelection';
 import SegmentRecommendations from '../components/SegmentRecommendations';
 import Button from '../components/Button';
 import ProgressSteps from '../components/ProgressSteps';
-import { PlanProvider, usePlan } from '../context/PlanContext';
+import { PlanProvider, usePlan } from '../components/PlanContext';
 
 const PlanContent: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +25,8 @@ const PlanContent: React.FC = () => {
     addMessage,
     getEnvironmentName,
     getFormatName,
+    environments,
+    adFormats,
   } = usePlan();
 
   const [promptInput, setPromptInput] = useState('');
@@ -142,6 +144,7 @@ const PlanContent: React.FC = () => {
 
         {currentStep === 1 && (
           <EnvironmentSelection
+            environments={environments}
             selectedEnvironment={selectedEnvironment}
             onEnvironmentSelect={handleEnvironmentSelect}
           />
@@ -149,7 +152,7 @@ const PlanContent: React.FC = () => {
 
         {currentStep === 2 && selectedEnvironment && (
           <AdFormatSelection
-            selectedEnvironment={selectedEnvironment}
+            adFormats={adFormats[selectedEnvironment] || []}
             selectedFormats={selectedFormats}
             environmentName={getEnvironmentName(selectedEnvironment)}
             onFormatSelect={handleFormatSelect}

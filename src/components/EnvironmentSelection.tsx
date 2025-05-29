@@ -1,14 +1,16 @@
 import React from 'react';
 import { Globe, Tv, Users } from 'lucide-react';
 import OptionCard from './OptionCard';
-import { environments } from '../data/mockData';
+import { Environment } from '../types';
 
 interface EnvironmentSelectionProps {
+  environments: Environment[];
   selectedEnvironment: string | null;
   onEnvironmentSelect: (envId: string) => void;
 }
 
 const EnvironmentSelection: React.FC<EnvironmentSelectionProps> = ({
+  environments,
   selectedEnvironment,
   onEnvironmentSelect,
 }) => {

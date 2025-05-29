@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { environments, adFormats, audienceSegments } from '../data/mockData';
+import { apiClient } from '../data/apiClient';
+import { Environment, AdFormat, SegmentRecommendationResponse } from '../types';
 
 interface PlanContextType {
   currentStep: number;
@@ -10,13 +11,16 @@ interface PlanContextType {
   setSelectedFormats: (formats: string[]) => void;
   campaignPrompt: string;
   setCampaignPrompt: (prompt: string) => void;
-  recommendedSegments: typeof audienceSegments;
+  recommendedSegments: SegmentRecommendationResponse | null;
   isLoading: boolean;
   messages: Array<{ type: 'ai' | 'user'; content: string }>;
   addMessage: (message: { type: 'ai' | 'user'; content: string }) => void;
   getEnvironmentName: (id: string) => string;
   getFormatName: (id: string) => string;
   resetPlan: () => void;
+  // Data from API
+  environments: Environment[];
+  adFormats: { [key: string]: AdFormat[] };
 }
 
 const PlanContext = createContext<PlanContextType | undefined>(undefined);
@@ -26,7 +30,7 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [selectedEnvironment, setSelectedEnvironment] = useState<string | null>(null);
   const [selectedFormats, setSelectedFormats] = useState<string[]>([]);
   const [campaignPrompt, setCampaignPrompt] = useState('');
-  const [recommendedSegments, setRecommendedSegments] = useState<typeof audienceSegments>([]);
+  const [recommendedSegments, setRecommendedSegments] = useState<SegmentRecommendationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Array<{ type: 'ai' | 'user'; content: string }>>([
     {
@@ -34,6 +38,29 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
       content: 'Hi there! I\'m your Kargo AI assistant. I\'ll help you plan your advertising campaign. Let\'s start by selecting an environment for your ads.',
     },
   ]);
+
+  // Data from API
+  const [environments, setEnvironments] = useState<Environment[]>([]);
+  const [adFormats, setAdFormats] = useState<{ [key: string]: AdFormat[] }>({});
+
+  // Load data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [envData, formatsData] = await Promise.all([
+          apiClient.getEnvironments(),
+          apiClient.getAdFormats(),
+        ]);
+        
+        setEnvironments(envData);
+        setAdFormats(formatsData as { [key: string]: AdFormat[] });
+      } catch (error) {
+        console.error('Failed to load data:', error);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const addMessage = (message: { type: 'ai' | 'user'; content: string }) => {
     setMessages((prev) => [...prev, message]);
@@ -57,66 +84,38 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (campaignPrompt && selectedEnvironment && selectedFormats.length > 0) {
       setIsLoading(true);
       
-      // Simulate AI processing
-      setTimeout(() => {
-        // Simple logic to recommend segments based on prompt keywords
-        const prompt = campaignPrompt.toLowerCase();
-        let recommended: typeof audienceSegments = [];
-        
-        if (prompt.includes('gen z') || prompt.includes('young') || prompt.includes('youth') || prompt.includes('college')) {
-          recommended.push(audienceSegments.find(s => s.id === 'gen-z')!);
+      // Get segments from API based on campaign prompt
+      const fetchSegments = async () => {
+        try {
+          const segmentResponse = await apiClient.getSegments(campaignPrompt, 5);
+          setRecommendedSegments(segmentResponse);
+          
+          // Add AI response message
+          addMessage({
+            type: 'ai',
+            content: `Based on your campaign for "${campaignPrompt}", I created ${segmentResponse?.count || 0} audience segments for your ${getEnvironmentName(selectedEnvironment)} using ${selectedFormats.map(f => getFormatName(f)).join(' and ')}:`,
+          });
+          
+          setCurrentStep(4);
+        } catch (error) {
+          console.error('Failed to get segments:', error);
+          // Fallback to showing no segments
+          setRecommendedSegments(null);
+        } finally {
+          setIsLoading(false);
         }
-        
-        if (prompt.includes('millennial') || prompt.includes('young adult') || prompt.includes('professionals')) {
-          recommended.push(audienceSegments.find(s => s.id === 'millennials')!);
-        }
-        
-        if (prompt.includes('parent') || prompt.includes('family') || prompt.includes('kid') || prompt.includes('child')) {
-          recommended.push(audienceSegments.find(s => s.id === 'parents')!);
-        }
-        
-        if (prompt.includes('luxury') || prompt.includes('premium') || prompt.includes('high-end') || prompt.includes('exclusive')) {
-          recommended.push(audienceSegments.find(s => s.id === 'luxury-shoppers')!);
-        }
-        
-        if (prompt.includes('tech') || prompt.includes('gadget') || prompt.includes('innovation') || prompt.includes('digital')) {
-          recommended.push(audienceSegments.find(s => s.id === 'tech-enthusiasts')!);
-        }
-        
-        // If no matches, recommend based on selected environment
-        if (recommended.length === 0) {
-          if (selectedEnvironment === 'social') {
-            recommended.push(audienceSegments.find(s => s.id === 'gen-z')!);
-            recommended.push(audienceSegments.find(s => s.id === 'millennials')!);
-          } else if (selectedEnvironment === 'ctv') {
-            recommended.push(audienceSegments.find(s => s.id === 'parents')!);
-            recommended.push(audienceSegments.find(s => s.id === 'luxury-shoppers')!);
-          } else {
-            recommended.push(audienceSegments.find(s => s.id === 'millennials')!);
-            recommended.push(audienceSegments.find(s => s.id === 'tech-enthusiasts')!);
-          }
-        }
-        
-        setRecommendedSegments(recommended);
-        setIsLoading(false);
-        
-        // Add AI response message
-        addMessage({
-          type: 'ai',
-          content: `Based on your campaign for "${campaignPrompt}", I recommend the following audience segments for your ${getEnvironmentName(selectedEnvironment)} campaign using ${selectedFormats.map(f => getFormatName(f)).join(' and ')}:`,
-        });
-        
-        setCurrentStep(4);
-      }, 2000);
+      };
+
+      fetchSegments();
     }
-  }, [campaignPrompt, selectedEnvironment, selectedFormats]);
+  }, [campaignPrompt, selectedEnvironment, selectedFormats, environments, adFormats]);
 
   const resetPlan = () => {
     setCurrentStep(1);
     setSelectedEnvironment(null);
     setSelectedFormats([]);
     setCampaignPrompt('');
-    setRecommendedSegments([]);
+    setRecommendedSegments(null);
     setMessages([
       {
         type: 'ai',
@@ -143,6 +142,8 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
         getEnvironmentName,
         getFormatName,
         resetPlan,
+        environments,
+        adFormats,
       }}
     >
       {children}
