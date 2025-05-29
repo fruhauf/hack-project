@@ -17,6 +17,7 @@ interface ConversationThreadProps {
   promptInput: string;
   setPromptInput: (value: string) => void;
   onPromptSubmit: (e: React.FormEvent) => void;
+  isPromptSubmitted: boolean;
   // Segment recommendations props
   recommendedSegments: SegmentRecommendationResponse | null;
   onContinueToFormats: () => void;
@@ -36,6 +37,7 @@ const ConversationThread: React.FC<ConversationThreadProps> = ({
   promptInput,
   setPromptInput,
   onPromptSubmit,
+  isPromptSubmitted,
   recommendedSegments,
   onContinueToFormats,
   adFormats,
@@ -77,7 +79,7 @@ const ConversationThread: React.FC<ConversationThreadProps> = ({
         );
       
       case 'prompt-input':
-        return (
+        return isPromptSubmitted ? null : (
           <div key={item.id} className="my-4">
             <PromptInput
               promptInput={promptInput}

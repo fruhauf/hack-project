@@ -13,6 +13,8 @@ interface PlanContextType {
   setCampaignPrompt: (prompt: string) => void;
   recommendedSegments: SegmentRecommendationResponse | null;
   isLoading: boolean;
+  isPromptSubmitted: boolean;
+  setIsPromptSubmitted: (submitted: boolean) => void;
   conversationItems: ConversationItem[];
   addMessage: (messageType: 'ai' | 'user', content: string) => void;
   addConversationItem: (item: Omit<ConversationItem, 'id'>) => void;
@@ -34,6 +36,7 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [campaignPrompt, setCampaignPrompt] = useState('');
   const [recommendedSegments, setRecommendedSegments] = useState<SegmentRecommendationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPromptSubmitted, setIsPromptSubmitted] = useState(false);
   const [conversationItems, setConversationItems] = useState<ConversationItem[]>([
     {
       type: 'message',
@@ -147,6 +150,7 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSelectedFormats([]);
     setCampaignPrompt('');
     setRecommendedSegments(null);
+    setIsPromptSubmitted(false);
     setConversationItems([
       {
         type: 'message',
@@ -174,6 +178,8 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCampaignPrompt,
         recommendedSegments,
         isLoading,
+        isPromptSubmitted,
+        setIsPromptSubmitted,
         conversationItems,
         addMessage,
         addConversationItem,

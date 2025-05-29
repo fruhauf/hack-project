@@ -16,6 +16,8 @@ const PlanContent: React.FC = () => {
     setSelectedFormats,
     setCampaignPrompt,
     recommendedSegments,
+    isPromptSubmitted,
+    setIsPromptSubmitted,
     conversationItems,
     addMessage,
     addConversationItem,
@@ -80,6 +82,7 @@ const PlanContent: React.FC = () => {
     setCampaignPrompt(promptInput);
     addMessage("user", promptInput);
     setPromptInput("");
+    setIsPromptSubmitted(true);
 
     // Processing and response are handled by the effect in PlanContext
   };
@@ -144,6 +147,7 @@ const PlanContent: React.FC = () => {
           promptInput={promptInput}
           setPromptInput={setPromptInput}
           onPromptSubmit={handlePromptSubmit}
+          isPromptSubmitted={isPromptSubmitted}
           recommendedSegments={recommendedSegments}
           onContinueToFormats={handleContinueToFormats}
           adFormats={adFormats[selectedEnvironment || ''] || []}
