@@ -1,6 +1,5 @@
 import React from 'react';
 import { Send } from 'lucide-react';
-import Button from './Button';
 
 interface PromptInputProps {
   promptInput: string;
@@ -14,18 +13,22 @@ const PromptInput: React.FC<PromptInputProps> = ({
   onSubmit,
 }) => {
   return (
-    <form onSubmit={onSubmit} className="mt-4">
-      <div className="flex space-x-2">
+    <form onSubmit={onSubmit} className="mt-6 w-full">
+      <div className="relative w-full bg-white">
         <input
           type="text"
           value={promptInput}
           onChange={(e) => setPromptInput(e.target.value)}
           placeholder="Describe your campaign goal (e.g., Launch summer sneaker collection to Gen Z)"
-          className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          className="w-full p-3 px-4 pr-14 rounded-lg border border-gray-300 shadow-sm focus:ring-primary"
+          autoFocus
         />
-        <Button type="submit" icon={<Send className="h-4 w-4" />}>
-          Send
-        </Button>
+        <button
+          type="submit"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-primary hover:bg-blue-800 text-white rounded-full transition-all duration-200 hover:scale-105 focus:outline-none"
+        >
+          <Send className="h-4 w-4" />
+        </button>
       </div>
     </form>
   );
