@@ -13,7 +13,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ type, content, isLoading 
   return (
     <div className={`flex ${type === 'user' ? 'justify-end' : 'justify-start'} mb-4`}>
       <div
-        className={`max-w-[85%] md:max-w-[70%] p-4 rounded-lg ${
+        className={`max-w-[95%] md:max-w-[85%] p-4 rounded-lg ${
           type === 'user'
             ? 'bg-primary text-white rounded-br-none'
             : 'bg-white border border-gray-200 shadow-sm rounded-bl-none'

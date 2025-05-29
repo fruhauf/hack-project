@@ -54,7 +54,7 @@ export const adFormats = {
     {
       id: "breakaway",
       title: "Breakaway",
-      description: "Elegant scrolling format that reveals as users engage",
+      description: " Animated, screen-anchored attention driver",
       imageUrl: "/assets/images/breakaway.gif",
     },
     {

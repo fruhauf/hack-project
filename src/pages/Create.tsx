@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Palette, Image, Users, ArrowRight, Check, RefreshCcw, X } from 'lucide-react';
 import Button from '../components/Button';
 import FormatCard from '../components/FormatCard';
@@ -13,7 +12,6 @@ interface CreativePreview {
 }
 
 const CreatePage: React.FC = () => {
-  const navigate = useNavigate();
   const [selectedFormat, setSelectedFormat] = useState<string | null>(null);
   const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
   const [creativePrompt, setCreativePrompt] = useState('');
@@ -30,7 +28,7 @@ const CreatePage: React.FC = () => {
   ]);
 
   // Flatten all formats into a single array
-  const allFormats = Object.values(adFormats).flat();
+  const allFormats = Object.values(adFormats.openweb).flat();
 
   const handleFormatSelect = (formatId: string) => {
     setSelectedFormat(formatId);
@@ -173,22 +171,23 @@ const CreatePage: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 lg:col-span-2">
           <div className="flex items-center mb-4">
             <Palette className="h-5 w-5 text-gray-500 mr-2" />
             <h2 className="text-lg font-medium">Select Format</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex gap-4 flex-wrap">
             {allFormats.map((format) => (
-              <FormatCard
-                key={format.id}
-                title={format.title}
-                description={format.description}
-                imageUrl={format.imageUrl}
-                isSelected={selectedFormat === format.id}
-                onClick={() => handleFormatSelect(format.id)}
-              />
+              <div key={format.id} className="flex-1 min-w-0">
+                <FormatCard
+                  title={format.title}
+                  description={format.description}
+                  imageUrl={format.imageUrl}
+                  isSelected={selectedFormat === format.id}
+                  onClick={() => handleFormatSelect(format.id)}
+                />
+              </div>
             ))}
           </div>
         </div>
