@@ -42,7 +42,7 @@ const AdFormatSelection: React.FC<AdFormatSelectionProps> = ({
           disabled={selectedFormats.length === 0}
           icon={<ArrowRight className="h-4 w-4" />}
         >
-          Continue
+          Activate Campaign
         </Button>
       </div>
     </div>

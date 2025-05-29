@@ -81,7 +81,7 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    if (campaignPrompt && selectedEnvironment && selectedFormats.length > 0) {
+    if (campaignPrompt && selectedEnvironment) {
       setIsLoading(true);
       
       // Get segments from API based on campaign prompt
@@ -93,10 +93,10 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Add AI response message
           addMessage({
             type: 'ai',
-            content: `Based on your campaign for "${campaignPrompt}", I created ${segmentResponse?.count || 0} audience segments for your ${getEnvironmentName(selectedEnvironment)} using ${selectedFormats.map(f => getFormatName(f)).join(' and ')}:`,
+            content: `Based on your campaign for "${campaignPrompt}", I created ${segmentResponse?.count || 0} audience segments for your ${getEnvironmentName(selectedEnvironment)} campaign:`,
           });
           
-          setCurrentStep(4);
+          setCurrentStep(3);
         } catch (error) {
           console.error('Failed to get segments:', error);
           // Fallback to showing no segments
@@ -108,7 +108,7 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       fetchSegments();
     }
-  }, [campaignPrompt, selectedEnvironment, selectedFormats, environments, adFormats]);
+  }, [campaignPrompt, selectedEnvironment, environments, adFormats]);
 
   const resetPlan = () => {
     setCurrentStep(1);

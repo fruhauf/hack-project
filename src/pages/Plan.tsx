@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Send } from 'lucide-react';
-import MessageBubble from '../components/MessageBubble';
-import EnvironmentSelection from '../components/EnvironmentSelection';
-import AdFormatSelection from '../components/AdFormatSelection';
-import SegmentRecommendations from '../components/SegmentRecommendations';
-import Button from '../components/Button';
-import ProgressSteps from '../components/ProgressSteps';
-import { PlanProvider, usePlan } from '../components/PlanContext';
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import MessageBubble from "../components/MessageBubble";
+import EnvironmentSelection from "../components/EnvironmentSelection";
+import AdFormatSelection from "../components/AdFormatSelection";
+import SegmentRecommendations from "../components/SegmentRecommendations";
+import PromptInput from "../components/PromptInput";
+import Button from "../components/Button";
+import ProgressSteps from "../components/ProgressSteps";
+import { PlanProvider, usePlan } from "../components/PlanContext";
 
 const PlanContent: React.FC = () => {
   const navigate = useNavigate();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const {
     currentStep,
     setCurrentStep,
@@ -29,19 +30,29 @@ const PlanContent: React.FC = () => {
     adFormats,
   } = usePlan();
 
-  const [promptInput, setPromptInput] = useState('');
+  const [promptInput, setPromptInput] = useState("");
+
+  // Auto-scroll to bottom when messages change or loading state changes
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages, isLoading, currentStep]);
 
   const handleEnvironmentSelect = (envId: string) => {
     setSelectedEnvironment(envId);
     addMessage({
-      type: 'user',
+      type: "user",
       content: `I want to advertise on ${getEnvironmentName(envId)}`,
     });
 
     setTimeout(() => {
       addMessage({
-        type: 'ai',
-        content: `Great choice! ${getEnvironmentName(envId)} offers excellent opportunities for brand engagement. Now, let's select ad formats that work best for ${getEnvironmentName(envId)}.`,
+        type: "ai",
+        content: `Great choice! ${getEnvironmentName(
+          envId
+        )} offers excellent opportunities for brand engagement. Now, tell me about your campaign goals. What are you promoting, and who is your target audience?`,
       });
       setCurrentStep(2);
     }, 500);
@@ -51,76 +62,87 @@ const PlanContent: React.FC = () => {
     const newSelectedFormats = selectedFormats.includes(formatId)
       ? selectedFormats.filter((id) => id !== formatId)
       : [...selectedFormats, formatId];
-    
+
     setSelectedFormats(newSelectedFormats);
   };
 
   const handleFormatConfirm = () => {
     if (selectedFormats.length === 0) return;
-    
-    const formatNames = selectedFormats.map(id => getFormatName(id)).join(', ');
-    
+
+    const formatNames = selectedFormats
+      .map((id) => getFormatName(id))
+      .join(", ");
+
     addMessage({
-      type: 'user',
+      type: "user",
       content: `I'd like to use these formats: ${formatNames}`,
     });
 
     setTimeout(() => {
       addMessage({
-        type: 'ai',
-        content: 'Excellent choices! Now, tell me about your campaign goals. What are you promoting, and who is your target audience?',
+        type: "ai",
+        content:
+          "Perfect! Your campaign planning is complete. You're ready to activate your campaign with the selected audience segments and ad formats.",
       });
-      setCurrentStep(3);
+      // Navigate directly to activate since this is now the final step
+      navigate("/activate");
     }, 500);
   };
 
   const handlePromptSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!promptInput.trim()) return;
-    
+
     setCampaignPrompt(promptInput);
     addMessage({
-      type: 'user',
+      type: "user",
       content: promptInput,
     });
-    setPromptInput('');
-    
+    setPromptInput("");
+
     // Processing and response are handled by the effect in PlanContext
+    // This will now trigger step 3 (segments) instead of step 4
   };
 
-  const handleContinueToActivate = () => {
-    navigate('/activate');
+  const handleContinueToFormats = () => {
+    addMessage({
+      type: "ai",
+      content: `Based on your audience segments, let's now choose the best ad formats for ${getEnvironmentName(
+        selectedEnvironment || ""
+      )} that will effectively reach your target audience.`,
+    });
+    setCurrentStep(4);
   };
 
   const progressSteps = [
     {
-      id: 'env',
-      title: 'Environment',
+      id: "env",
+      title: "Environment",
       isCompleted: currentStep > 1,
       isCurrent: currentStep === 1,
     },
     {
-      id: 'format',
-      title: 'Ad Format',
+      id: "campaign",
+      title: "Campaign Goal",
       isCompleted: currentStep > 2,
       isCurrent: currentStep === 2,
     },
     {
-      id: 'campaign',
-      title: 'Campaign Goal',
+      id: "recommendations",
+      title: "Recommendations",
       isCompleted: currentStep > 3,
       isCurrent: currentStep === 3,
     },
     {
-      id: 'recommendations',
-      title: 'Recommendations',
-      isCompleted: false,
+      id: "format",
+      title: "Ad Format",
+      isCompleted: currentStep > 4,
       isCurrent: currentStep === 4,
     },
   ];
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="flex flex-col flex-1 min-h-0 max-w-5xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Campaign Planning</h1>
         <p className="text-gray-500 mt-1">
@@ -130,59 +152,62 @@ const PlanContent: React.FC = () => {
 
       <ProgressSteps steps={progressSteps} />
 
-      <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 md:p-6 mt-6">
-        <div className="space-y-4 max-h-[400px] overflow-y-auto mb-4 pr-2">
-          {messages.map((message, index) => (
-            <MessageBubble
-              key={index}
-              type={message.type}
-              content={message.content}
-            />
-          ))}
-          {isLoading && <MessageBubble type="ai" content="" isLoading={true} />}
-        </div>
-
-        {currentStep === 1 && (
-          <EnvironmentSelection
-            environments={environments}
-            selectedEnvironment={selectedEnvironment}
-            onEnvironmentSelect={handleEnvironmentSelect}
-          />
-        )}
-
-        {currentStep === 2 && selectedEnvironment && (
-          <AdFormatSelection
-            adFormats={adFormats[selectedEnvironment] || []}
-            selectedFormats={selectedFormats}
-            environmentName={getEnvironmentName(selectedEnvironment)}
-            onFormatSelect={handleFormatSelect}
-            onFormatConfirm={handleFormatConfirm}
-          />
-        )}
-
-        {currentStep === 3 && (
-          <form onSubmit={handlePromptSubmit} className="mt-4">
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={promptInput}
-                onChange={(e) => setPromptInput(e.target.value)}
-                placeholder="Describe your campaign goal (e.g., Launch summer sneaker collection to Gen Z)"
-                className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+      <div
+        ref={scrollContainerRef}
+        className="flex flex-1 flex-col min-h-0 overflow-y-auto bg-gray-50 rounded-lg border border-gray-200 p-4 md:p-6 my-6"
+      >
+        <div>
+          <div className="space-y-4 mb-4 pr-2">
+            {messages.map((message, index) => (
+              <MessageBubble
+                key={index}
+                type={message.type}
+                content={message.content}
               />
-              <Button type="submit" icon={<Send className="h-4 w-4" />}>
-                Send
+            ))}
+            {isLoading && (
+              <MessageBubble type="ai" content="" isLoading={true} />
+            )}
+          </div>
+
+          {currentStep === 1 && (
+            <EnvironmentSelection
+              environments={environments}
+              selectedEnvironment={selectedEnvironment}
+              onEnvironmentSelect={handleEnvironmentSelect}
+            />
+          )}
+
+          {currentStep === 2 && !isLoading && (
+            <PromptInput
+              promptInput={promptInput}
+              setPromptInput={setPromptInput}
+              onSubmit={handlePromptSubmit}
+            />
+          )}
+
+          {currentStep >= 3 && (
+            <SegmentRecommendations recommendedSegments={recommendedSegments} />
+          )}
+          
+          {currentStep === 3 && (
+            <div className="flex justify-end mt-6">
+              <Button onClick={handleContinueToFormats} variant="primary">
+                Continue to Ad Formats
               </Button>
             </div>
-          </form>
-        )}
+          )}
 
-        {currentStep === 4 && (
-          <SegmentRecommendations
-            recommendedSegments={recommendedSegments}
-            onContinueToActivate={handleContinueToActivate}
-          />
-        )}
+          {currentStep === 4 && selectedEnvironment && (
+            <AdFormatSelection
+              adFormats={adFormats[selectedEnvironment] || []}
+              selectedFormats={selectedFormats}
+              environmentName={getEnvironmentName(selectedEnvironment)}
+              onFormatSelect={handleFormatSelect}
+              onFormatConfirm={handleFormatConfirm}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

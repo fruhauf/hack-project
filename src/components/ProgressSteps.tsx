@@ -35,7 +35,7 @@ const ProgressSteps: React.FC<ProgressStepsProps> = ({ steps }) => {
               </div>
             </div>
             <span 
-              className={`ml-2 text-sm font-medium ${
+              className={`ml-2 text-sm font-medium whitespace-nowrap ${
                 step.isCompleted || step.isCurrent ? 'text-blue-600' : 'text-gray-500'
               }`}
             >

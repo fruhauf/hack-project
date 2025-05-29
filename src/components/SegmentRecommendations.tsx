@@ -1,16 +1,13 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
-import Button from './Button';
 import { SegmentRecommendationResponse } from '../types';
 
 interface SegmentRecommendationsProps {
   recommendedSegments: SegmentRecommendationResponse | null;
-  onContinueToActivate: () => void;
 }
 
 const SegmentRecommendations: React.FC<SegmentRecommendationsProps> = ({
   recommendedSegments,
-  onContinueToActivate,
 }) => {
   if (!recommendedSegments || !recommendedSegments.urls || recommendedSegments.urls.length === 0) {
     return null;
@@ -67,13 +64,7 @@ const SegmentRecommendations: React.FC<SegmentRecommendationsProps> = ({
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="flex justify-end mt-6">
-        <Button onClick={onContinueToActivate} variant="primary">
-          Continue to Activate
-        </Button>
-      </div>
+      </div>      
     </div>
   );
 };
