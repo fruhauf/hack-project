@@ -25,9 +25,9 @@ const ProgressSteps: React.FC<ProgressStepsProps> = ({ steps }) => {
               <div 
                 className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors ${
                   step.isCompleted 
-                    ? 'bg-blue-600 text-white' 
+                    ? 'bg-primary text-white' 
                     : step.isCurrent 
-                      ? 'border-2 border-blue-600 text-blue-600'
+                      ? 'border-2 border-primary text-primary'
                       : 'bg-gray-200 text-gray-500'
                 }`}
               >
@@ -36,7 +36,7 @@ const ProgressSteps: React.FC<ProgressStepsProps> = ({ steps }) => {
             </div>
             <span 
               className={`ml-2 text-sm font-medium whitespace-nowrap ${
-                step.isCompleted || step.isCurrent ? 'text-blue-600' : 'text-gray-500'
+                step.isCompleted || step.isCurrent ? 'text-primary' : 'text-gray-500'
               }`}
             >
               {step.title}
@@ -44,7 +44,7 @@ const ProgressSteps: React.FC<ProgressStepsProps> = ({ steps }) => {
             
             {index < steps.length - 1 && (
               <div className={`flex-1 h-0.5 mx-4 ${
-                step.isCompleted ? 'bg-blue-600' : 'bg-gray-200'
+                step.isCompleted ? 'bg-primary' : 'bg-gray-200'
               }`}></div>
             )}
           </li>

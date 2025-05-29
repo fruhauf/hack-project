@@ -46,7 +46,7 @@ const OptionCard: React.FC<OptionCardProps> = ({
             isDisabled 
               ? 'bg-gray-100 text-gray-400' 
               : isSelected 
-              ? 'bg-blue-100 text-blue-600' 
+              ? 'bg-blue-100 text-primary' 
               : 'bg-gray-100 text-gray-600'
           }`}>
             {icon}

@@ -15,7 +15,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ type, content, isLoading 
       <div
         className={`max-w-[85%] md:max-w-[70%] p-4 rounded-lg ${
           type === 'user'
-            ? 'bg-blue-600 text-white rounded-br-none'
+            ? 'bg-primary text-white rounded-br-none'
             : 'bg-white border border-gray-200 shadow-sm rounded-bl-none'
         }`}
       >

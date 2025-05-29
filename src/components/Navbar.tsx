@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
             <Settings size={20} />
           </button>
           <div className="flex items-center">
-            <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center text-white">
+            <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center text-white">
               <User size={16} />
             </div>
           </div>
