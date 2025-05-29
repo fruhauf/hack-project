@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiClient } from '../data/apiClient';
-import { Environment, AdFormat, SegmentRecommendationResponse } from '../types';
+import { Environment, AdFormat, SegmentRecommendationResponse, ConversationItem } from '../types';
 
 interface PlanContextType {
   currentStep: number;
@@ -13,8 +13,10 @@ interface PlanContextType {
   setCampaignPrompt: (prompt: string) => void;
   recommendedSegments: SegmentRecommendationResponse | null;
   isLoading: boolean;
-  messages: Array<{ type: 'ai' | 'user'; content: string }>;
-  addMessage: (message: { type: 'ai' | 'user'; content: string }) => void;
+  conversationItems: ConversationItem[];
+  addMessage: (messageType: 'ai' | 'user', content: string) => void;
+  addConversationItem: (item: Omit<ConversationItem, 'id'>) => void;
+  removeLastConversationItem: () => void;
   getEnvironmentName: (id: string) => string;
   getFormatName: (id: string) => string;
   resetPlan: () => void;
@@ -32,10 +34,16 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [campaignPrompt, setCampaignPrompt] = useState('');
   const [recommendedSegments, setRecommendedSegments] = useState<SegmentRecommendationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState<Array<{ type: 'ai' | 'user'; content: string }>>([
+  const [conversationItems, setConversationItems] = useState<ConversationItem[]>([
     {
-      type: 'ai',
+      type: 'message',
+      messageType: 'ai',
       content: 'Hi there! I\'m your Kargo AI assistant. I\'ll help you plan your advertising campaign. Let\'s start by selecting an environment for your ads.',
+      id: 'initial-message',
+    },
+    {
+      type: 'environment-selection',
+      id: 'environment-selection',
     },
   ]);
 
@@ -62,8 +70,26 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadData();
   }, []);
 
-  const addMessage = (message: { type: 'ai' | 'user'; content: string }) => {
-    setMessages((prev) => [...prev, message]);
+  const addMessage = (messageType: 'ai' | 'user', content: string) => {
+    const newItem: ConversationItem = {
+      type: 'message',
+      messageType,
+      content,
+      id: `message-${Date.now()}-${Math.random()}`,
+    };
+    setConversationItems((prev) => [...prev, newItem]);
+  };
+
+  const addConversationItem = (item: Omit<ConversationItem, 'id'>) => {
+    const newItem: ConversationItem = {
+      ...item,
+      id: `${item.type}-${Date.now()}-${Math.random()}`,
+    } as ConversationItem;
+    setConversationItems((prev) => [...prev, newItem]);
+  };
+
+  const removeLastConversationItem = () => {
+    setConversationItems((prev) => prev.slice(0, -1));
   };
 
   const getEnvironmentName = (id: string): string => {
@@ -82,6 +108,8 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (campaignPrompt && selectedEnvironment) {
+      // Add loading indicator
+      addConversationItem({ type: 'loading' });
       setIsLoading(true);
       
       // Get segments from API based on campaign prompt
@@ -90,16 +118,19 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const segmentResponse = await apiClient.getSegments(campaignPrompt, 5);
           setRecommendedSegments(segmentResponse);
           
+          // Remove loading indicator
+          removeLastConversationItem();
+          
           // Add AI response message
-          addMessage({
-            type: 'ai',
-            content: `Based on your campaign for "${campaignPrompt}", I created ${segmentResponse?.count || 0} audience segments for your ${getEnvironmentName(selectedEnvironment)} campaign:`,
-          });
+          addMessage('ai', `Based on your campaign for "${campaignPrompt}", I created ${segmentResponse?.count || 0} audience segments for your ${getEnvironmentName(selectedEnvironment)} campaign:`);
+          
+          // Add segment recommendations component
+          addConversationItem({ type: 'segment-recommendations' });
           
           setCurrentStep(3);
         } catch (error) {
           console.error('Failed to get segments:', error);
-          // Fallback to showing no segments
+          removeLastConversationItem();
           setRecommendedSegments(null);
         } finally {
           setIsLoading(false);
@@ -116,10 +147,16 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSelectedFormats([]);
     setCampaignPrompt('');
     setRecommendedSegments(null);
-    setMessages([
+    setConversationItems([
       {
-        type: 'ai',
+        type: 'message',
+        messageType: 'ai',
         content: 'Hi there! I\'m your Kargo AI assistant. I\'ll help you plan your advertising campaign. Let\'s start by selecting an environment for your ads.',
+        id: 'initial-message',
+      },
+      {
+        type: 'environment-selection',
+        id: 'environment-selection',
       },
     ]);
   };
@@ -137,8 +174,10 @@ export const PlanProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCampaignPrompt,
         recommendedSegments,
         isLoading,
-        messages,
+        conversationItems,
         addMessage,
+        addConversationItem,
+        removeLastConversationItem,
         getEnvironmentName,
         getFormatName,
         resetPlan,

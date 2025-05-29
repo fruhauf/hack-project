@@ -32,3 +32,31 @@ export interface SegmentRecommendationResponse {
   prompt: string;
   timestamp: string;
 }
+
+export type ConversationItem =
+  | {
+      type: "message";
+      messageType: "ai" | "user";
+      content: string;
+      id: string;
+    }
+  | {
+      type: "environment-selection";
+      id: string;
+    }
+  | {
+      type: "prompt-input";
+      id: string;
+    }
+  | {
+      type: "segment-recommendations";
+      id: string;
+    }
+  | {
+      type: "ad-format-selection";
+      id: string;
+    }
+  | {
+      type: "loading";
+      id: string;
+    };

@@ -1,11 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import MessageBubble from "../components/MessageBubble";
-import EnvironmentSelection from "../components/EnvironmentSelection";
-import AdFormatSelection from "../components/AdFormatSelection";
-import SegmentRecommendations from "../components/SegmentRecommendations";
-import PromptInput from "../components/PromptInput";
-import Button from "../components/Button";
+import ConversationThread from "../components/ConversationThread";
 import ProgressSteps from "../components/ProgressSteps";
 import { PlanProvider, usePlan } from "../components/PlanContext";
 
@@ -21,9 +16,9 @@ const PlanContent: React.FC = () => {
     setSelectedFormats,
     setCampaignPrompt,
     recommendedSegments,
-    isLoading,
-    messages,
+    conversationItems,
     addMessage,
+    addConversationItem,
     getEnvironmentName,
     getFormatName,
     environments,
@@ -32,28 +27,25 @@ const PlanContent: React.FC = () => {
 
   const [promptInput, setPromptInput] = useState("");
 
-  // Auto-scroll to bottom when messages change or loading state changes
+  // Auto-scroll to bottom when conversation changes
   useEffect(() => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       container.scrollTop = container.scrollHeight;
     }
-  }, [messages, isLoading, currentStep]);
+  }, [conversationItems]);
 
   const handleEnvironmentSelect = (envId: string) => {
     setSelectedEnvironment(envId);
-    addMessage({
-      type: "user",
-      content: `I want to advertise on ${getEnvironmentName(envId)}`,
-    });
+    addMessage("user", `I want to advertise on ${getEnvironmentName(envId)}`);
 
     setTimeout(() => {
-      addMessage({
-        type: "ai",
-        content: `Great choice! ${getEnvironmentName(
-          envId
-        )} offers excellent opportunities for brand engagement. Now, tell me about your campaign goals. What are you promoting, and who is your target audience?`,
-      });
+      addMessage("ai", `Great choice! ${getEnvironmentName(
+        envId
+      )} offers excellent opportunities for brand engagement. Now, tell me about your campaign goals. What are you promoting, and who is your target audience?`);
+      
+      // Add prompt input component to conversation
+      addConversationItem({ type: 'prompt-input' });
       setCurrentStep(2);
     }, 500);
   };
@@ -73,18 +65,10 @@ const PlanContent: React.FC = () => {
       .map((id) => getFormatName(id))
       .join(", ");
 
-    addMessage({
-      type: "user",
-      content: `I'd like to use these formats: ${formatNames}`,
-    });
+    addMessage("user", `I'd like to use these formats: ${formatNames}`);
 
     setTimeout(() => {
-      addMessage({
-        type: "ai",
-        content:
-          "Perfect! Your campaign planning is complete. You're ready to activate your campaign with the selected audience segments and ad formats.",
-      });
-      // Navigate directly to activate since this is now the final step
+      addMessage("ai", "Perfect! Your campaign planning is complete. You're ready to activate your campaign with the selected audience segments and ad formats.");
       navigate("/activate");
     }, 500);
   };
@@ -94,23 +78,19 @@ const PlanContent: React.FC = () => {
     if (!promptInput.trim()) return;
 
     setCampaignPrompt(promptInput);
-    addMessage({
-      type: "user",
-      content: promptInput,
-    });
+    addMessage("user", promptInput);
     setPromptInput("");
 
     // Processing and response are handled by the effect in PlanContext
-    // This will now trigger step 3 (segments) instead of step 4
   };
 
   const handleContinueToFormats = () => {
-    addMessage({
-      type: "ai",
-      content: `Based on your audience segments, let's now choose the best ad formats for ${getEnvironmentName(
-        selectedEnvironment || ""
-      )} that will effectively reach your target audience.`,
-    });
+    addMessage("ai", `Based on your audience segments, let's now choose the best ad formats for ${getEnvironmentName(
+      selectedEnvironment || ""
+    )} that will effectively reach your target audience.`);
+    
+    // Add ad format selection component to conversation
+    addConversationItem({ type: 'ad-format-selection' });
     setCurrentStep(4);
   };
 
@@ -152,62 +132,26 @@ const PlanContent: React.FC = () => {
 
       <ProgressSteps steps={progressSteps} />
 
-      <div
+      <div 
         ref={scrollContainerRef}
         className="flex flex-1 flex-col min-h-0 overflow-y-auto bg-gray-50 rounded-lg border border-gray-200 p-4 md:p-6 my-6"
       >
-        <div>
-          <div className="space-y-4 mb-4 pr-2">
-            {messages.map((message, index) => (
-              <MessageBubble
-                key={index}
-                type={message.type}
-                content={message.content}
-              />
-            ))}
-            {isLoading && (
-              <MessageBubble type="ai" content="" isLoading={true} />
-            )}
-          </div>
-
-          {currentStep === 1 && (
-            <EnvironmentSelection
-              environments={environments}
-              selectedEnvironment={selectedEnvironment}
-              onEnvironmentSelect={handleEnvironmentSelect}
-            />
-          )}
-
-          {currentStep === 2 && !isLoading && (
-            <PromptInput
-              promptInput={promptInput}
-              setPromptInput={setPromptInput}
-              onSubmit={handlePromptSubmit}
-            />
-          )}
-
-          {currentStep >= 3 && (
-            <SegmentRecommendations recommendedSegments={recommendedSegments} />
-          )}
-          
-          {currentStep === 3 && (
-            <div className="flex justify-end mt-6">
-              <Button onClick={handleContinueToFormats} variant="primary">
-                Continue to Ad Formats
-              </Button>
-            </div>
-          )}
-
-          {currentStep === 4 && selectedEnvironment && (
-            <AdFormatSelection
-              adFormats={adFormats[selectedEnvironment] || []}
-              selectedFormats={selectedFormats}
-              environmentName={getEnvironmentName(selectedEnvironment)}
-              onFormatSelect={handleFormatSelect}
-              onFormatConfirm={handleFormatConfirm}
-            />
-          )}
-        </div>
+        <ConversationThread
+          conversationItems={conversationItems}
+          environments={environments}
+          selectedEnvironment={selectedEnvironment}
+          onEnvironmentSelect={handleEnvironmentSelect}
+          promptInput={promptInput}
+          setPromptInput={setPromptInput}
+          onPromptSubmit={handlePromptSubmit}
+          recommendedSegments={recommendedSegments}
+          onContinueToFormats={handleContinueToFormats}
+          adFormats={adFormats[selectedEnvironment || ''] || []}
+          selectedFormats={selectedFormats}
+          environmentName={getEnvironmentName(selectedEnvironment || '')}
+          onFormatSelect={handleFormatSelect}
+          onFormatConfirm={handleFormatConfirm}
+        />
       </div>
     </div>
   );
